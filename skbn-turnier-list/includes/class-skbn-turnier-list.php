@@ -269,6 +269,45 @@ class SKBN_Turnier_List {
 		// title
 		$o .= '<h2>' . esc_html( $wporg_atts['title'] ) . '</h2>';
 
+		$date_now = date('Y-m-d H:i:s');
+			
+		// args
+		$posts = get_posts(array(
+			'numberposts'   => -1,
+			'post_type'     => 'turnier',
+			'order'         => 'ASC',
+			'orderby'       => 'meta_value',
+			'meta_key'      => 'datum',
+			'meta_type'     => 'DATETIME',
+			'meta_query'    => array(
+				array(
+					'key'     => 'datum',
+					'compare' => '>=',
+					'value'   => $date_now,
+					'type'    => 'DATETIME',
+				),
+			),
+		));
+
+		if( $posts ) {
+			$o .= '<ul>';
+			foreach(  $posts as $post ) {
+				$o .= '<li>';
+				$o .= '<a href="' . get_permalink($post) . '">';
+				
+				$unixtimestamp = strtotime( get_field('datum',$post) );
+				$o .= date_i18n( "D d.m. G:i",$unixtimestamp);
+				$o .= '&nbsp;';
+				$o .= get_the_title($post);
+				$o .= '</a>';
+				/*
+				*/
+				$o .= '</li>';
+			}
+			$o .= '</ul>';
+		}
+		// wp_reset_query();
+
 		// enclosing tags
 		if ( ! is_null( $content ) ) {
 			// $content here holds everything in between the opening and the closing tags of your shortcode. eg.g [my-shortcode]content[/my-shortcode].
